@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build algorithm programme",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-o", "main_launcher.exe", "-g", "LU_decomposition.cpp"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

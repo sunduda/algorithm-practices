@@ -18,6 +18,9 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="matrix2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -26,7 +29,7 @@
     <ClCompile Include="algorithm-practices.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LU_decomposition.cpp">
+    <ClCompile Include="matrix2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

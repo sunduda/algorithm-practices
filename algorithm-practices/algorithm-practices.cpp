@@ -3,20 +3,33 @@
 
 #include "pch.h"
 #include <iostream>
+#include <iomanip>
+#include "matrix2D.cpp"
 
-int main()
-{
-    std::cout << "Hello World!\n"; 
-	system("PAUSE");
+#define N 5
+
+int main() {
+	Matrix2D<double> m_a(N);
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			m_a.matrix[i - 1][j - 1] = rand() % 100 + 1;
+			std::cout << m_a.matrix[i - 1][j - 1] << ' ';
+		}
+	}
+	std::cout << std::endl << std::endl;
+	m_a.LUDecomposition();
+
+	m_a.DisplayLU("combined");
+	m_a.DisplayLU("separated");
+
+	Matrix2D<double> mtest((int)m_a.matrix.size());
+	mtest = m_a.LUComposition();
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			std::cout << mtest.matrix[i - 1][j - 1] << ' ';
+		}
+	}
+
+	return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

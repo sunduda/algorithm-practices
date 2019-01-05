@@ -11,62 +11,76 @@ using namespace myla;
 
 template <typename T>
 void Matrix2D<T>::Pivot(int k) {
-	T max_val = INT_MIN;
-	int max_index = 0;
+	std::vector< std::vector<T> >& m = this->matrix;
+	std::vector<int>& pr = this->matrix_pr_;
+	std::vector<int>& pc = this->matrix_pc_;
+	T max_val = -128;
+	int max_i = 0;
+	int max_j = 0;
 	int pk = 0;
-	T x;
 	for (int i = k; i < this->n_rows_; i++) {
-		x = abs(this->matrix[this->matrix_p_[i]][k]);
-		if (x > max_val) {
-			max_val = x;
-			max_index = i
+		for (int j = k; j < this->n_cols_; j++) {
+			if (m[pr[i]][pc[j]] > max_val) {
+				max_val = m[pr[i]][pc[j]];
+				max_i = i;
+				max_j = j;
+			}
 		}
 	}
 
-	pk = this->matrix_p_[k];
-	this->matrix_p_[k] = this->matrix_p_[max_index];
-	this->matrix_p_[max_index] = pk;
+	pk = pr[k];
+	pr[k] = pr[max_i];
+	pr[max_i] = pk;
+	pk = pc[k];
+	pc[k] = pc[max_j];
+	pc[max_j] = pk;
 }
 
 template <typename T>
 bool Matrix2D<T>::LUDecomposition() {
+	std::vector< std::vector<T> >& m = this->matrix;
+	std::vector< std::vector<long double> >& mlu = this->matrix_lu_;
+	std::vector<int>& pr = this->matrix_pr_;
+	std::vector<int>& pc = this->matrix_pc_;
 	int i = 0;
-	int s = std::min(this->n_rows_, this->n_cols_)
+	int s = 0;
 	long double temp;
 
-	for (int c = 0; c < this->n_cols_; c++) this->matrix_lu_[0][c] = this->matrix[0][c];
-
+	if (this->n_rows_ <= this->n_cols_) s = this->n_rows_ - 1;
+	else s = this->n_cols_;
 	while (i < s) {
-		if (i < this->n_rows_ - 1) {
-			for (int r = i + 1; r < this->n_rows_; r++) {
-				if (i > 0) {
-					temp = matrix[r][i] - matrix_lu_[r][0] * matrix_lu_[0][i];
-					for (int j = 1; j < i; j++) {
-						temp -= matrix_lu_[r][j] * matrix_lu_[j][i];
-					}
+		this->Pivot(i);
+		if (i == 0) {
+			for (int c = 0; c < this->n_cols_; c++) mlu[pr[0]][pc[c]] = m[pr[0]][pc[c]];
+		}
+		for (int r = i + 1; r < this->n_rows_; r++) {
+			if (i > 0) {
+				temp = m[pr[r]][pc[i]] - mlu[pr[r]][pc[0]] * mlu[pr[0]][pc[i]];
+				for (int j = 1; j < i; j++) {
+					temp -= mlu[pr[r]][pc[j]] * mlu[pr[j]][pc[i]];
 				}
-				else {
-					temp = matrix[r][0];
+			}
+			else {
+				temp = m[pr[r]][pc[0]];
+			}
+			mlu[pr[r]][pc[i]] = temp / mlu[pr[i]][pc[i]];
+		}
+		if (!((this->n_rows_ > this->n_cols_) && (i == s - 1))) {
+			for (int c = i + 1; c < this->n_cols_; c++) {
+				temp = m[pr[i+1]][pc[c]] - mlu[pr[i + 1]][pc[0]] * mlu[pr[0]][pc[c]];
+				for (int j = 1; j < i + 1; j++) {
+					temp -= mlu[pr[i + 1]][pc[j]] * mlu[pr[j]][pc[c]];
 				}
-				matrix_lu_[r][i] = temp / matrix_lu_[i][i];
+				mlu[pr[i + 1]][pc[c]] = temp;
 			}
 		}
-
-		for (int c = i + 1; c < this->n_cols_; c++) {
-			temp = matrix[i + 1][c] - matrix_lu_[i+1][0] * matrix_lu_[0][c];
-			for (int j = 1; j < i + 1; j++) {
-				temp -= matrix_lu_[i+1][j] * matrix_lu_[j][i+1];
-			}
-			matrix_lu_[i+1][c] = temp;
-		}
-
 		++i;
 	}
 	return true;
 }
 
 template <typename T>
-static Matrix2D<T> Matrix2D<T>::LUComposition(std::vector< std::vector<T> > matrix_lu_) {
+static Matrix2D<T> Matrix2D<T>::LUComposition(std::vector< std::vector<long double> > m_lu) {
 	if (this->n_rows_ != this->n_cols_) return NULL;
 	Matrix2D<T> ans(this->n_rows_);
 	for (int i = 0; i < this->n_rows_; i++) {
@@ -81,38 +95,13 @@ static Matrix2D<T> Matrix2D<T>::LUComposition(std::vector< std::vector<T> > matr
 }
 
 template <typename T>
-void Matrix2D<T>::DisplayLU(std::string mode) {
-	if (mode.compare("combined") == 0) {
-		for (int i = 0; i < n_rows_; i++) {
-			for (int k = 0; k < i; k++) {
-				std::cout << matrix_l_[(1 + i)*i / 2 + k] << "\t\t";
-			}
-			for (int k = i; k < n_cols_; k++) {
-				std::cout << std::left << std::setw(25) << matrix_u_[(1 + k)*k / 2 + i];
-				if ((k == n_cols_ - 1) && (i != n_rows_)) std::cout << std::endl << std::endl;
-				else if (k == n_cols_ - 1) std::cout << std::endl;
-			}
+void Matrix2D<T>::DisplayLU() {
+	for (int i = 0; i < this->n_rows_; i++) {
+		for (int j = 0; j < this->n_cols_; j++) {
+			std::cout << this->matrix_lu_[i][j];
+			if (j < this->n_cols_ - 1) std::cout << "\t\t";
 		}
-
-	}
-	else if (mode.compare("separated") == 0) {
-		for (int i = 0; i < n_rows_; i++) {
-			for (int k = i; k < n_cols_; k++) {
-				std::cout << matrix_u_[(1 + k)*k / 2 + i];
-				if (k != n_cols_ - 1) std::cout << "\t";
-				else std::cout << std::endl;
-			}
-		}
-
-		std::cout << std::endl;
-
-		for (int i = 0; i < n_rows_; i++) {
-			for (int k = 0; k <= i; k++) {
-				std::cout << matrix_l_[(1 + i)*i / 2 + k];
-				if (k != i) std::cout << "\t";
-				else std::cout << std::endl;
-			}
-		}
+		std::cout << std::endl << std::endl;
 	}
 }
 

@@ -19,17 +19,16 @@ int main() {
 	std::cout << std::endl << std::endl;
 	m_a.LUDecomposition();
 
-	m_a.DisplayLU("combined");
-	m_a.DisplayLU("separated");
+	m_a.DisplayLU();
 
-	Matrix2D<double> mtest((int)m_a.matrix.size());
+	/*Matrix2D<double> mtest((int)m_a.matrix.size());
 	mtest = m_a.LUComposition();
 
 	for (int i = 1; i <= N; i++) {
 		for (int j = 1; j <= N; j++) {
 			std::cout << mtest.matrix[i - 1][j - 1] << ' ';
 		}
-	}
+	}*/
 
 	return 0;
 }

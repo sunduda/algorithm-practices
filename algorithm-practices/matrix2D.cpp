@@ -16,7 +16,7 @@ void Matrix2D<T>::Pivot(int k) {
 	int pk = 0;
 	T x;
 	for (int i = k; i < this->n_rows_; i++) {
-		x = abs(this->matrix[this->matrix_p_[i][k]);
+		x = abs(this->matrix[this->matrix_p_[i]][k]);
 		if (x > max_val) {
 			max_val = x;
 			max_index = i

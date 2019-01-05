@@ -25,7 +25,7 @@ namespace myla {
 	private:
 		void Pivot(int k);
 		std::vector< std::vector<long double> > matrix_lu_;
-		std::vector<int> matrix_p_;
+		std::vector<int> matrix_pr_, matrix_pc_;
 		int n_rows_, n_cols_;
 	};
 }

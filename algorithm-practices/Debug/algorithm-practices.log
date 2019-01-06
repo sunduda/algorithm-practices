@@ -1,2 +1,5 @@
-﻿  matrix2D.cpp
+﻿  pch.cpp
+  algorithm-practices.cpp
+  matrix2D.cpp
+  Generating Code...
   algorithm-practices.vcxproj -> C:\Users\Christopher\source\repos\algorithm-practices\Debug\algorithm-practices.exe

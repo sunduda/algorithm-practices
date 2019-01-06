@@ -10,14 +10,14 @@ namespace myla {
 		Matrix2D(int r, int c = -1) {
 			if (c < 0) c = r;
 			this->matrix.resize(r, std::vector<T>(c));
-			this->matrix_lu_.resize(r, std::vector<long double>(c));
+			this->matrix_lu_.resize(r, std::vector<double>(c));
 			this->n_rows_ = r;
 			this->n_cols_ = c;
 			for (int i = 0; i < r; i++) this->matrix_pr_.push_back(i);
 			for (int j = 0; j < c; j++) this->matrix_pc_.push_back(j);
 		}
 		bool LUDecomposition();
-		static Matrix2D<T> LUComposition(std::vector< std::vector<long double> > m_lu = this->matrix_lu_);
+		static Matrix2D<T> LUComposition(std::vector< std::vector<double> > m_lu = this->matrix_lu_);
 		void DisplayLU();
 		Matrix2D<T> operator*(const Matrix2D &m);
 
@@ -25,9 +25,11 @@ namespace myla {
 
 		~Matrix2D() {};
 
+	protected:
+
 	private:
 		void Pivot(int k);
-		std::vector< std::vector<long double> > matrix_lu_;
+		std::vector< std::vector<double> > matrix_lu_;
 		std::vector<int> matrix_pr_, matrix_pc_;
 		int n_rows_, n_cols_;
 	};

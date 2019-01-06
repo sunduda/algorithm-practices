@@ -13,9 +13,18 @@ int main() {
 	for (int i = 1; i <= N; i++) {
 		for (int j = 1; j <= N; j++) {
 			m_a.matrix[i - 1][j - 1] = rand() % 100 + 1;
-			std::cout << m_a.matrix[i - 1][j - 1] << ' ';
+			std::cout << m_a.matrix[i - 1][j - 1];
+			if (j == N) std::cout << std::endl;
+			else std::cout << '\t';
 		}
 	}
+	std::cout << std::endl;
+	/*for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			m_a.matrix[i][j] = 25 - 5 * i - j;
+			std::cout << m_a.matrix[i][j] << ' ';
+		}
+	}*/
 	std::cout << std::endl << std::endl;
 	m_a.LUDecomposition();
 

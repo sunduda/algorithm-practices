@@ -12,17 +12,17 @@ using namespace myla;
 
 template <typename T>
 void Matrix2D<T>::Pivot(int k) {
-	std::vector< std::vector<T> >& m = this->matrix;
+	std::vector< std::vector<double> >& mlu = this->matrix_lu_;
 	std::vector<int>& pr = this->matrix_pr_;
 	std::vector<int>& pc = this->matrix_pc_;
 	T max_val = -128;
-	int max_i = 0;
-	int max_j = 0;
-	int pk = 0;
+	int max_i = k;
+	int max_j = k;
+	int pk = k;
 	for (int i = k; i < this->n_rows_; i++) {
 		for (int j = k; j < this->n_cols_; j++) {
-			if (m[pr[i]][pc[j]] > max_val) {
-				max_val = m[pr[i]][pc[j]];
+			if (abs(mlu[pr[i]][pc[j]]) > max_val) {
+				max_val = abs(mlu[pr[i]][pc[j]]);
 				max_i = i;
 				max_j = j;
 			}
@@ -35,59 +35,36 @@ void Matrix2D<T>::Pivot(int k) {
 	pk = pc[k];
 	pc[k] = pc[max_j];
 	pc[max_j] = pk;
-
-	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < 5; j++) {
-			std::cout << m[pr[i]][pc[j]];
-			if (j == 4) std::cout << std::endl;
-			else std::cout << '\t';
-		}
-	}
-	std::cout << std::endl;
 }
 
 template <typename T>
 bool Matrix2D<T>::LUDecomposition() {
-	std::vector< std::vector<T> >& m = this->matrix;
 	std::vector< std::vector<double> >& mlu = this->matrix_lu_;
 	std::vector<int>& pr = this->matrix_pr_;
 	std::vector<int>& pc = this->matrix_pc_;
-	int i = 0;
-	int s = 0;
-	double temp, divisor = 1.0;
+	int s = std::min(this->n_rows_, this->n_cols_);
+	double divisor = 1.0;
 
-	if (this->n_rows_ <= this->n_cols_) s = this->n_rows_ - 1;
-	else s = this->n_cols_;
-	while (i < s) {
-		this->Pivot(i);
-		if (i == 0) {
-			for (int c = 0; c < this->n_cols_; c++) mlu[pr[0]][pc[c]] = m[pr[0]][pc[c]];
+	for (int i = 0; i < s; i++) {
+		if (i <= 0) mlu = this->matrix;
+		else {
+			for (int r = i; r < this->n_rows_; r++) {
+				for (int c = i; c < this->n_cols_; c++) {
+					mlu[pr[r]][pc[c]] -= mlu[pr[r]][pc[i-1]] * mlu[pr[i-1]][pc[c]];
+					if (isfinite(mlu[pr[r]][pc[c]]) && (abs(mlu[pr[r]][pc[c]]) < PRECISION)) mlu[pr[r]][pc[c]] = 0;
+				}
+			}
 		}
+
+		this->Pivot(i);
 		divisor = 1 / mlu[pr[i]][pc[i]];
 		for (int r = i + 1; r < this->n_rows_; r++) {
-			if (i > 0) {
-				temp = m[pr[r]][pc[i]] - mlu[pr[r]][pc[0]] * mlu[pr[0]][pc[i]];
-				for (int j = 1; j < i; j++) temp -= mlu[pr[r]][pc[j]] * mlu[pr[j]][pc[i]];
-			}
-			else {
-				temp = m[pr[r]][pc[0]];
-			}
-			mlu[pr[r]][pc[i]] = temp * divisor;
-			if (isfinite(mlu[pr[r]][pc[i]])) {
-				mlu[pr[r]][pc[i]] = (abs(mlu[pr[r]][pc[i]]) >= PRECISION) ? mlu[pr[r]][pc[i]] : 0;
-			}
+			mlu[pr[r]][pc[i]] *= divisor;
+			if (isfinite(mlu[pr[r]][pc[i]]) && (abs(mlu[pr[r]][pc[i]]) < PRECISION)) mlu[pr[r]][pc[i]] = 0;
 		}
-		if (!((this->n_rows_ > this->n_cols_) && (i == s - 1))) {
-			for (int c = i + 1; c < this->n_cols_; c++) {
-				temp = m[pr[i+1]][pc[c]] - mlu[pr[i + 1]][pc[0]] * mlu[pr[0]][pc[c]];
-				for (int j = 1; j < i + 1; j++) temp -= mlu[pr[i + 1]][pc[j]] * mlu[pr[j]][pc[c]];
-				if (isfinite(temp)) mlu[pr[i + 1]][pc[c]] = (abs(temp) >= PRECISION) ? temp : 0;
-			}
-		}
-		++i;
 	}
 	return true;
-}
+}  
 
 template <typename T>
 static Matrix2D<T> Matrix2D<T>::LUComposition(std::vector< std::vector<double> > m_lu) {
@@ -105,13 +82,23 @@ static Matrix2D<T> Matrix2D<T>::LUComposition(std::vector< std::vector<double> >
 }
 
 template <typename T>
-void Matrix2D<T>::DisplayLU() {
+void Matrix2D<T>::DisplayLU(unsigned pcs, int x) {
+	std::vector< std::vector<double> >& mlu = this->matrix_lu_;
+	std::vector<int>& pr = this->matrix_pr_;
+	std::vector<int>& pc = this->matrix_pc_;
+	std::cout.setf(std::ios::right);
 	for (int i = 0; i < this->n_rows_; i++) {
 		for (int j = 0; j < this->n_cols_; j++) {
-			std::cout << this->matrix_lu_[i][j];
-			if (j < this->n_cols_ - 1) std::cout << "\t\t";
+			std::cout.width(pcs);
+			if (x == 0) {
+				std::cout << mlu[pr[i]][pc[j]];
+			}
+			else {
+				std::cout << mlu[i][j];
+			}
+			if (j < this->n_cols_ - 1) std::cout << '\t';
 		}
-		std::cout << std::endl << std::endl;
+		std::cout << std::endl;
 	}
 }
 
@@ -128,6 +115,17 @@ Matrix2D<T> Matrix2D<T>::operator*(const Matrix2D &m) {
 		}
 	}
 	return ans;
+}
+
+template <typename T>
+double Matrix2D<T>::Determinant() {
+	std::vector< std::vector<double> >& mlu = this->matrix_lu_;
+	std::vector<int>& pr = this->matrix_pr_;
+	std::vector<int>& pc = this->matrix_pc_;
+	double det = 1;
+	if (this->n_rows_ != this->n_cols_) return 0;
+	for (int i = 0; i < this->n_rows_; i++) det *= mlu[pr[i]][pc[i]];
+	return det;
 }
 
 #endif

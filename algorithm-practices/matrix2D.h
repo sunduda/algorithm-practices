@@ -18,7 +18,8 @@ namespace myla {
 		}
 		bool LUDecomposition();
 		static Matrix2D<T> LUComposition(std::vector< std::vector<double> > m_lu = this->matrix_lu_);
-		void DisplayLU();
+		void DisplayLU(unsigned pcs = 10, int x = 0);
+		double Determinant();
 		Matrix2D<T> operator*(const Matrix2D &m);
 
 		std::vector< std::vector<T> > matrix;

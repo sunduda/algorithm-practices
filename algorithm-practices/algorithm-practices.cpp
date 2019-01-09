@@ -6,13 +6,13 @@
 #include <iomanip>
 #include "matrix2D.cpp"
 
-#define ROWS 5
-#define COLS 3
+constexpr auto ROWS = 5;
+#define COLS 5
 
 int main() {
 	Matrix2D<double> m_a(ROWS, COLS);
 	std::cout.setf(std::ios::right);
-	for (int i = 1; i <= ROWS; i++) {
+	/*for (int i = 1; i <= ROWS; i++) {
 		for (int j = 1; j <= COLS; j++) {
 			std::cout.width(4);
 			m_a.matrix[i - 1][j - 1] = rand() % 100 + 1;
@@ -21,18 +21,20 @@ int main() {
 			else std::cout << '\t';
 		}
 	}
-	std::cout << std::endl;
-	/*for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
+	std::cout << std::endl;*/
+	for (int i = 0; i < ROWS; i++) {
+		for (int j = 0; j < COLS; j++) {
+			std::cout.width(4);
 			m_a.matrix[i][j] = 25 - 5 * i - j;
 			std::cout << m_a.matrix[i][j];
-			if (j < N - 1) std::cout << ' ';
+			if (j < COLS - 1) std::cout << '\t';
 		}
 		std::cout << std::endl;
 	}
-	std::cout << std::endl << std::endl;*/
+	std::cout << std::endl << std::endl;
 	m_a.LUDecomposition();
 
+	
 	m_a.DisplayLU(10);
 
 	std::cout << std::endl << m_a.Determinant();

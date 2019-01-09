@@ -45,6 +45,9 @@ bool Matrix2D<T>::LUDecomposition() {
 	int s = std::min(this->n_rows_, this->n_cols_);
 	double divisor = 1.0;
 
+	this->is_decomposed_ = false;
+	this->is_invertible_ = true;
+
 	for (int i = 0; i < s; i++) {
 		if (i <= 0) mlu = this->matrix;
 		else {
@@ -52,6 +55,7 @@ bool Matrix2D<T>::LUDecomposition() {
 				for (int c = i; c < this->n_cols_; c++) {
 					mlu[pr[r]][pc[c]] -= mlu[pr[r]][pc[i-1]] * mlu[pr[i-1]][pc[c]];
 					if (isfinite(mlu[pr[r]][pc[c]]) && (abs(mlu[pr[r]][pc[c]]) < PRECISION)) mlu[pr[r]][pc[c]] = 0;
+					else if (!isfinite(mlu[pr[r]][pc[c]]) this->is_invertible_ = false;
 				}
 			}
 		}
@@ -61,8 +65,11 @@ bool Matrix2D<T>::LUDecomposition() {
 		for (int r = i + 1; r < this->n_rows_; r++) {
 			mlu[pr[r]][pc[i]] *= divisor;
 			if (isfinite(mlu[pr[r]][pc[i]]) && (abs(mlu[pr[r]][pc[i]]) < PRECISION)) mlu[pr[r]][pc[i]] = 0;
+			else if (!isfinite(mlu[pr[r]][pc[i]]) this->is_invertible_ = false;
 		}
 	}
+
+	this->is_decomposed_ = true;
 	return true;
 }  
 

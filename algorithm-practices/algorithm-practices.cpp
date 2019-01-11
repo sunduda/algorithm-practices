@@ -6,8 +6,8 @@
 #include <iomanip>
 #include "matrix2D.cpp"
 
-constexpr auto ROWS = 5;
-#define COLS 5
+constexpr int ROWS = 5;
+constexpr int COLS = 5;
 
 int main() {
 	Matrix2D<double> m_a(ROWS, COLS);

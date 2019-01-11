@@ -2,13 +2,77 @@
 #ifndef _MATRIX2D_CPP
 #define _MATRIX2D_CPP
 
-#include <string>
+#include <iostream>
 #include <algorithm>
 #include "matrix2D.h"
 
-#define PRECISION 10e-12
 
-using namespace myla;
+using namespace xinda_linear_algebra;
+
+template <typename T>
+bool Matrix2D<T>::Initialisation(const unsigned& r, const unsigned& c) {
+	// Check if inputted numbers of rows and columns are valid.
+	// If only one input is positive, then initialise a square matrix.
+	if ((r > 0) && (c <= 0)) {
+		this->n_rows_ = r;
+		this->n_cols_ = r;
+	}
+	else if ((r > 0) && (c > 0)) {
+		this->n_rows_ = r;
+		this->n_cols_ = c;
+	}
+	else if ((r <= 0) && (c > 0)) {
+		this->n_rows_ = c;
+		this->n_cols_ = c;
+		std::cout << "Invalid number of rows definition!" << std::endl;
+		std::cout << "Use the number of columns to create a square matrix." << std::endl;
+	}
+
+	try {
+		this->main_matrix_.resize(this->n_rows_, std::vector<T>(this->n_cols_));
+		// The size of compressed LU matrix is the same as its original matrix.
+		this->matrix_lu_.resize(this->n_rows_, std::vector<double>(this->n_cols_));
+		// Elementary Row/Column Operations mapping arrays initialisation.
+		this->matrix_pr_.resize(this->n_rows_, unsigned);
+		this->matrix_pc_.resize(this->n_cols_, unsigned);
+	}
+	catch (std::bad_alloc const&) {
+		std::cout << "Memory allocation failed!" << std::endl;
+		return false;
+	}
+	for (long i = 0; i < this->n_rows_; i++) this->matrix_pr_[i] = i;
+	for (long j = 0; j < this->n_cols_; j++) this->matrix_pc_[j] = j;
+	// Set flags to initial state.
+	this->is_decomposed_ = false;
+	this->is_invertible_ = false;
+
+	this->display_width_ = 4;
+
+	return true;
+}
+
+template <typename T>
+Matrix2D<T>& Matrix2D<T>::operator= (std::vector< std::vector<T> >& m) {
+	this->main_matrix_.clear();
+	this->main_matrix_.swap(m);
+	this->main_matrix_.shrink_to_fit();
+	m.shrink_to_fit();
+	return *this;
+}
+
+template <typename T>
+Matrix2D<T>& Matrix2D<T>::operator= (std::initializer_list< std::initializer_list<T> > il) {
+	const unsigned r = il.size();
+	const unsigned c = (*il.begin()).size();
+	if (!this->Initialisation(r, c)) return *this;
+	for (std::initializer_list< std::initializer_list<T> >::iterator it = il.begin(); it < il.end(); it++) {
+		for (std::initializer_list<T>::iterator jt = (*it).begin(); jt < (*it).end(); jt++) {
+			this->main_matrix_[it - il.begin()][jt - (*i).begin()] = *jt;
+		}
+	}
+	
+	return *this;
+}
 
 template <typename T>
 void Matrix2D<T>::Pivot(int k) {

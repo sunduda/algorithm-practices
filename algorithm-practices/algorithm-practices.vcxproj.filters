@@ -21,6 +21,12 @@
     <ClInclude Include="matrix2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="row_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyAuto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -30,6 +36,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="matrix2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="row_vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyAuto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

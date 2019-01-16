@@ -1,2 +1,11 @@
 ﻿  algorithm-practices.cpp
+c:\users\christopher\source\repos\algorithm-practices\algorithm-practices\matrix2d.h(31): warning C4244: 'argument': conversion from 'std::streamsize' to 'const int', possible loss of data
+  c:\users\christopher\source\repos\algorithm-practices\algorithm-practices\matrix2d.h(28): note: while compiling class template member function 'std::ostream &xinda_math::operator <<(std::ostream &,xinda_math::Matrix2D<double> &)'
+  c:\users\christopher\source\repos\algorithm-practices\algorithm-practices\algorithm-practices.cpp(13): note: see reference to class template instantiation 'xinda_math::Matrix2D<double>' being compiled
+c:\users\christopher\source\repos\algorithm-practices\algorithm-practices\matrix2d.cpp(72): warning C4018: '<': signed/unsigned mismatch
+  c:\users\christopher\source\repos\algorithm-practices\algorithm-practices\matrix2d.cpp(69): note: while compiling class template member function 'void xinda_math::Matrix2D<double>::SetDisplayWidth(const int &)'
+  c:\users\christopher\source\repos\algorithm-practices\algorithm-practices\matrix2d.h(31): note: see reference to function template instantiation 'void xinda_math::Matrix2D<double>::SetDisplayWidth(const int &)' being compiled
+c:\users\christopher\source\repos\algorithm-practices\algorithm-practices\matrix2d.cpp(73): warning C4018: '<': signed/unsigned mismatch
+  matrix2D.cpp
+  Generating Code...
   algorithm-practices.vcxproj -> C:\Users\Christopher\source\repos\algorithm-practices\Debug\algorithm-practices.exe

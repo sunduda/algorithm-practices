@@ -13,19 +13,16 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\xinda_math">
+      <UniqueIdentifier>{f38e2442-121a-4a32-b24d-4d6a2c711f54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="matrix2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="row_vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyAuto.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\xinda_math\tensor.hpp">
+      <Filter>Header Files\xinda_math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -35,13 +32,10 @@
     <ClCompile Include="algorithm-practices.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="matrix2D.cpp">
+    <ClCompile Include="include\xinda_math\tensor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="row_vector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MyAuto.cpp">
+    <ClCompile Include="include\xinda_math\matrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

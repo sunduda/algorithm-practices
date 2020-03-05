@@ -20,59 +20,75 @@ namespace xinda_math {
         // Constructor
         template<typename cT>
         explicit tensor(cT (&sizes)[D] = {0}, T &value = 0);
+        template<typename cT>
+        explicit tensor(cT (&sizes)[D] = {0}, T value = 0);
+        
+//        template<typename cT>
+//        explicit tensor(cT (&sizes)[D] = {0}, T value = 0);
+//
+//        template<typename cT>
+//        explicit tensor(cT sizes[D] = {0}, T value = 0);
 
         // Destructor
         virtual ~tensor() = default;
 
-        // Overload operators <<
-        friend std::ostream &operator<<(std::ostream &stream, tensor<D, T> &vtensor) {
-            stream.setf(std::ios::right);
-            stream.setf(std::ios::fixed);
-            vtensor.SetDisplayWidth(stream.precision());
-            for (int i = 0; i < vtensor.n_rows_; i++) {
-                for (int j = 0; j < vtensor.n_cols_; j++) {
-                    stream.width(vtensor.display_width_);
-                    stream << vtensor[i][j];
-                    if (j < vtensor.n_cols_ - 1) stream << '\t';
-                }
-                stream << std::endl;
-            }
-            return stream;
-        };
-
-        // Overload operators >>
-        friend std::ostream &operator>>(std::ostream &stream, tensor<D, T> &vtensor) {
-            stream.setf(std::ios::right);
-            stream.setf(std::ios::fixed);
-            vtensor.SetDisplayWidth(stream.precision());
-            for (int i = 0; i < vtensor.n_rows_; i++) {
-                for (int j = 0; j < vtensor.n_cols_; j++) {
-                    stream.width(vtensor.display_width_);
-                    stream << vtensor[i][j];
-                    if (j < vtensor.n_cols_ - 1) stream << '\t';
-                }
-                stream << std::endl;
-            }
-            return stream;
-        };
-
     protected:
-        template<std::size_t mD, typename mT>
-        struct multidimensional_vector {
-            typedef std::vector<typename multidimensional_vector<mD - 1, mT>::type> type;
-        };
+        tensor<D, T> &get_value(){return mTensor;};
+//        template<std::size_t mD, typename mT>
+//        struct multidimensional_vector {
+//            typedef std::vector<typename multidimensional_vector<mD - 1, mT>::type> type;
+//        };
 
 
-        template<typename cT>
-        void reset(cT (&sizes)[D] = {0}, T &value = 0);
+//        template<typename cT>
+//        void reset(cT (&sizes)[D] = {0}, T &value = 0);
 
-        typename multidimensional_vector<D, T>::type &get_value(){return mTensor;};
 
 
     private:
-        typename multidimensional_vector<D, T>::type mTensor;
+//        typename multidimensional_vector<D, T>::type mTensor;
+        std::vector<tensor<D-1, T>> mTensor;
+        // Actual initialization method used in the constructor
+        template<typename cT>
+        void initializer(cT (&sizes)[D], T &value);
 
     };
+    
+    template<typename T>
+    class tensor<1, T> {
+    public:
+        // Constructor
+        template<typename cT>
+        explicit tensor(cT &size = 1, T &value = 0);
+        template<typename cT>
+        explicit tensor(cT &size = 1, T value = 0);
+        explicit tensor(std::size_t size = 1, T &value = 0);
+        explicit tensor(std::size_t size = 1, T value = 0);
+        
+        // Destructor
+        virtual ~tensor() = default;
+
+    protected:
+        std::vector<T> &get_value(){return mTensor;};
+//        template<std::size_t mD, typename mT>
+//        struct multidimensional_vector {
+//            typedef std::vector<typename multidimensional_vector<mD - 1, mT>::type> type;
+//        };
+
+
+//        template<typename cT>
+//        void reset(cT (&sizes)[D] = {0}, T &value = 0);
+
+    
+    
+    private:
+//        typename multidimensional_vector<D, T>::type mTensor;
+        std::vector< T > mTensor;
+        // Actual initialization method used in the constructor
+        template<typename cT>
+        void initializer(cT &size = 1, T &value = 0);
+    };
+
 };
 
 
@@ -86,6 +102,38 @@ namespace xinda_math {
 // tensor<D, T> operator*(const tensor &m);
 // typename multidimensional_vector<D, T>::type &
 // select_dimension(typename multidimensional_vector<mD, mT>::type &mv);
+
+//// Overload operators <<
+//friend std::ostream &operator<<(std::ostream &stream, tensor<D, T> &vtensor) {
+//    stream.setf(std::ios::right);
+//    stream.setf(std::ios::fixed);
+//    vtensor.SetDisplayWidth(stream.precision());
+//    for (int i = 0; i < vtensor.n_rows_; i++) {
+//        for (int j = 0; j < vtensor.n_cols_; j++) {
+//            stream.width(vtensor.display_width_);
+//            stream << vtensor[i][j];
+//            if (j < vtensor.n_cols_ - 1) stream << '\t';
+//        }
+//        stream << std::endl;
+//    }
+//    return stream;
+//};
+//
+//// Overload operators >>
+//friend std::ostream &operator>>(std::ostream &stream, tensor<D, T> &vtensor) {
+//    stream.setf(std::ios::right);
+//    stream.setf(std::ios::fixed);
+//    vtensor.SetDisplayWidth(stream.precision());
+//    for (int i = 0; i < vtensor.n_rows_; i++) {
+//        for (int j = 0; j < vtensor.n_cols_; j++) {
+//            stream.width(vtensor.display_width_);
+//            stream << vtensor[i][j];
+//            if (j < vtensor.n_cols_ - 1) stream << '\t';
+//        }
+//        stream << std::endl;
+//    }
+//    return stream;
+//};
 
 
 // TODO: Realize the following methods when define the child class 'matrix'

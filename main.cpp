@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include <iomanip>
-#include "include/xinda_math/tensor.hpp"
 #include "include/xinda_math/tensor.h"
+#include "include/xinda_math/tensor.cpp"
 
 constexpr int ROWS = 5;
 constexpr int COLS = 5;
@@ -21,7 +21,7 @@ int main() {
 //	std::cout << m_a << std::endl;
 //	m_a.LUDecomposition();
 //	m_a.DisplayLU(2);
-    xinda_math::tensor<2, int> mtest({3,3}, 2);
-
+    std::size_t sizes[2] = {2, 2};
+    xinda_math::tensor<2, int> mtest(sizes, 2);
 	return 0;
 }

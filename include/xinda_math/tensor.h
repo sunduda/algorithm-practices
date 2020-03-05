@@ -6,38 +6,50 @@
 #define TENSOR_TOOLKIT_TENSOR_H
 
 
+#include <cstddef>
+#include <vector>
+#include <ostream>
+
 namespace xinda_math {
     constexpr double PRECISION = 10e-12;
     constexpr unsigned long GIGABYTE = 1073741824;
-    
-    template<size_t D, typename T>
+
+    template<std::size_t D, typename T>
     class tensor {
     public:
         // Constructor
-        tensor(size_t (&size)[D] = {0 });
-        bool reset(size_t(&size)[D] = { 0 });
-        tensor<D, T>& operator= (std::vector< std::vector<T> >& m);
-        tensor<D, T>& operator= (std::initializer_list< std::initializer_list<T> >& il);
-        std::vector<T>& operator[] (const int& index);
-        void AssignElement(const int& r = 0, const int& c = 0, const T& val = 0);
-        bool LUDecomposition();
-        static Matrix2D<T>& LUComposition(const std::vector< std::vector<double> >& m_lu = matrix_lu_);
-        void DisplayLU(int pcs = 10);
-        double Determinant();
-        Matrix2D<T> operator*(const Matrix2D &m);
+        template<typename cT>
+        explicit tensor(cT (&sizes)[D] = {0}, T &value = 0);
+
         // Destructor
-        virtual ~Matrix2D() {};
-    
-        // Overload operators
-        friend std::ostream& operator<< (std::ostream& stream, Matrix2D<T>& matrix) {
+        virtual ~tensor() = default;
+
+        // Overload operators <<
+        friend std::ostream &operator<<(std::ostream &stream, tensor<D, T> &vtensor) {
             stream.setf(std::ios::right);
             stream.setf(std::ios::fixed);
-            matrix.SetDisplayWidth(stream.precision());
-            for (int i = 0; i < matrix.n_rows_; i++) {
-                for (int j = 0; j < matrix.n_cols_; j++) {
-                    stream.width(matrix.display_width_);
-                    stream << matrix[i][j];
-                    if (j < matrix.n_cols_ - 1) stream << '\t';
+            vtensor.SetDisplayWidth(stream.precision());
+            for (int i = 0; i < vtensor.n_rows_; i++) {
+                for (int j = 0; j < vtensor.n_cols_; j++) {
+                    stream.width(vtensor.display_width_);
+                    stream << vtensor[i][j];
+                    if (j < vtensor.n_cols_ - 1) stream << '\t';
+                }
+                stream << std::endl;
+            }
+            return stream;
+        };
+
+        // Overload operators >>
+        friend std::ostream &operator>>(std::ostream &stream, tensor<D, T> &vtensor) {
+            stream.setf(std::ios::right);
+            stream.setf(std::ios::fixed);
+            vtensor.SetDisplayWidth(stream.precision());
+            for (int i = 0; i < vtensor.n_rows_; i++) {
+                for (int j = 0; j < vtensor.n_cols_; j++) {
+                    stream.width(vtensor.display_width_);
+                    stream << vtensor[i][j];
+                    if (j < vtensor.n_cols_ - 1) stream << '\t';
                 }
                 stream << std::endl;
             }
@@ -45,31 +57,49 @@ namespace xinda_math {
         };
 
     protected:
-        template <size_t dims>
-        multidimensional_vector<dims, T>::type& select_dimension(multidimensional_vector<dims, T>::type &mv);
-        multidimensional_vector<D, T>::type mTensor;
-        void FlagReset();
-        void SetDisplayWidth(const int& pcs = 2);
+        template<std::size_t mD, typename mT>
+        struct multidimensional_vector {
+            typedef std::vector<typename multidimensional_vector<mD - 1, mT>::type> type;
+        };
+
+
+        template<typename cT>
+        void reset(cT (&sizes)[D] = {0}, T &value = 0);
+
+        typename multidimensional_vector<D, T>::type &get_value(){return mTensor;};
+
 
     private:
-        void Pivot(int k);
-        std::vector< std::vector<T> > main_matrix_;
-        std::vector< std::vector<double> > matrix_lu_;
-        std::vector<int> matrix_pr_, matrix_pc_;
-        int n_rows_, n_cols_;
-        int display_width_;
-        bool is_decomposed_;
-        bool is_invertible_;
+        typename multidimensional_vector<D, T>::type mTensor;
+
     };
-    
-    template <size_t D, typename T>
-    struct multidimensional_vector
-    {
-        typedef std::vector< typename multidimensional_vector<D - 1, T>::type > type;
-    };
-    
-    long long pow(int x, int p);
 };
 
 
 #endif //TENSOR_TOOLKIT_TENSOR_H
+
+// TODO: Need to be defined methods
+// tensor<D, T> &operator=(std::vector<std::vector<T> > &m);
+// tensor<D, T> &operator=(std::initializer_list<std::initializer_list<T> > &il);
+// std::vector<T> &operator[](const int &index);
+// void set_element(const int &r = 0, const int &c = 0, const T &val = 0);
+// tensor<D, T> operator*(const tensor &m);
+// typename multidimensional_vector<D, T>::type &
+// select_dimension(typename multidimensional_vector<mD, mT>::type &mv);
+
+
+// TODO: Realize the following methods when define the child class 'matrix'
+// bool LUDecomposition();
+// static tensor<D, T> &LUComposition(const std::vector<std::vector<double> > &m_lu = matrix_lu_);
+// void DisplayLU(int pcs = 10);
+// double Determinant();
+// void Pivot(int k);
+// std::vector<std::vector<T> > main_matrix_;
+// std::vector<std::vector<double> > matrix_lu_;
+// std::vector<int> matrix_pr_, matrix_pc_;
+// int n_rows_, n_cols_;
+// int display_width_;
+// bool is_decomposed_;
+// bool is_invertible_;
+// void FlagReset();
+// void SetDisplayWidth(const int &pcs = 2);

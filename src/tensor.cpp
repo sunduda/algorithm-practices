@@ -21,53 +21,64 @@ tensor<D, T>::tensor(cT (&sizes)[D], T value) {
 }
 
 template<std::size_t D, typename T>
+tensor<D, T>::tensor(const std::size_t *sizes, T &value) {
+    std::size_t psizes[D] = {0};
+    for(std::size_t i=0;i<D;i++) psizes[i] = sizes[i];
+    tensor<D, T>::initializer(psizes, value);
+}
+
+template<std::size_t D, typename T>
+tensor<D, T>::tensor(const std::size_t *sizes, T value) {
+    std::size_t psizes[D] = {0};
+    for(std::size_t i=0;i<D;i++) psizes[i] = sizes[i];
+    tensor<D, T>::initializer(psizes, value);
+}
+
+template<std::size_t D, typename T>
 template<typename cT>
 void tensor<D, T>::initializer(cT (&sizes)[D], T &value) {
     if (!(std::is_same<cT, std::size_t>::value || std::is_same<cT, unsigned short>::value ||
           std::is_same<cT, unsigned>::value || std::is_same<cT, unsigned long>::value))
         throw std::invalid_argument("Invalid typename!");
     cT new_sizes[D - 1];
-    cT new_size;
     for (std::size_t i = 1; i < D; i++) new_sizes[i - 1] = sizes[i];
-    if (D == 2) {
-        new_size = sizes[1];
-        tensor<1, T> &temp_tensor(new_size, value);
-        for (cT i = 0; i < sizes[0]; i++) this->mTensor.push_back(temp_tensor.get_value());
-    } else if (D > 2) {
-        tensor<D - 1, T> &temp_tensor(new_sizes, value);
-        for (cT i = 0; i < sizes[0]; i++) this->mTensor.push_back(temp_tensor.get_value());
-    } else throw std::invalid_argument("Invalid dimensions!");
+    tensor<D - 1, T> &temp_tensor(new_sizes, value);
+    for (cT i = 0; i < sizes[0]; i++) this->mTensor.push_back(temp_tensor.get_value());
 }
 
 template<typename T>
 template<typename cT>
-tensor<1, T>::tensor(cT &size, T &value) {
-    tensor<1, T>::initializer(size, value);
+tensor<1, T>::tensor(cT (&sizes)[1], T &value) {
+    tensor<1, T>::initializer(sizes, value);
 }
 
 template<typename T>
 template<typename cT>
-tensor<1, T>::tensor(cT &size, T value) {
-    tensor<1, T>::initializer(size, value);
+tensor<1, T>::tensor(cT (&sizes)[1], T value) {
+    tensor<1, T>::initializer(sizes, value);
 }
 
 template<typename T>
-tensor<1, T>::tensor(std::size_t size, T &value) {
-    tensor<1, T>::initializer(size, value);
+tensor<1, T>::tensor(const std::size_t *sizes, T &value) {
+    std::size_t psizes[1] = {1};
+    psizes[0] = sizes[0];
+    tensor<1, T>::initializer(psizes, value);
 }
 
 template<typename T>
-tensor<1, T>::tensor(std::size_t size, T value) {
-    tensor<1, T>::initializer(size, value);
+tensor<1, T>::tensor(const std::size_t *sizes, T value) {
+    std::size_t psizes[1] = {1};
+    psizes[0] = sizes[0];
+    tensor<1, T>::initializer(psizes, value);
 }
 
 template<typename T>
 template<typename cT>
-void tensor<1, T>::initializer(cT &size, T &value) {
+void tensor<1, T>::initializer(cT (&sizes)[1], T &value) {
     if (!(std::is_same<cT, std::size_t>::value || std::is_same<cT, unsigned short>::value ||
           std::is_same<cT, unsigned>::value || std::is_same<cT, unsigned long>::value))
         throw std::invalid_argument("Invalid typename!");
-    for (cT i = 0; i < size; i++) this->mTensor.push_back(value);
+    for (cT i = 0; i < sizes[0]; i++) this->mTensor.push_back(value);
 }
 
 //

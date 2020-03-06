@@ -19,74 +19,56 @@ namespace xinda_math {
     public:
         // Constructor
         template<typename cT>
-        explicit tensor(cT (&sizes)[D] = {0}, T &value = 0);
+        explicit tensor(cT (&sizes)[D], T &value = 0);
+
         template<typename cT>
-        explicit tensor(cT (&sizes)[D] = {0}, T value = 0);
-        
-//        template<typename cT>
-//        explicit tensor(cT (&sizes)[D] = {0}, T value = 0);
-//
-//        template<typename cT>
-//        explicit tensor(cT sizes[D] = {0}, T value = 0);
+        explicit tensor(cT (&sizes)[D], T value = 0);
+
+        explicit tensor(const std::size_t sizes[D], T &value = 0);
+
+        explicit tensor(const std::size_t sizes[D], T value = 0);
 
         // Destructor
         virtual ~tensor() = default;
 
     protected:
-        tensor<D, T> &get_value(){return mTensor;};
-//        template<std::size_t mD, typename mT>
-//        struct multidimensional_vector {
-//            typedef std::vector<typename multidimensional_vector<mD - 1, mT>::type> type;
-//        };
-
-
-//        template<typename cT>
-//        void reset(cT (&sizes)[D] = {0}, T &value = 0);
-
-
+        std::vector<tensor<D - 1, T>> get_value() { return this->mTensor; };
 
     private:
-//        typename multidimensional_vector<D, T>::type mTensor;
-        std::vector<tensor<D-1, T>> mTensor;
+        std::vector<tensor<D - 1, T>> mTensor;
+
         // Actual initialization method used in the constructor
         template<typename cT>
         void initializer(cT (&sizes)[D], T &value);
 
     };
-    
+
     template<typename T>
     class tensor<1, T> {
     public:
         // Constructor
         template<typename cT>
-        explicit tensor(cT &size = 1, T &value = 0);
+        explicit tensor(cT (&sizes)[1], T &value = 0);
+
         template<typename cT>
-        explicit tensor(cT &size = 1, T value = 0);
-        explicit tensor(std::size_t size = 1, T &value = 0);
-        explicit tensor(std::size_t size = 1, T value = 0);
-        
+        explicit tensor(cT (&sizes)[1], T value = 0);
+
+        explicit tensor(const std::size_t sizes[1], T &value = 0);
+
+        explicit tensor(const std::size_t sizes[1], T value = 0);
+
         // Destructor
         virtual ~tensor() = default;
 
     protected:
-        std::vector<T> &get_value(){return mTensor;};
-//        template<std::size_t mD, typename mT>
-//        struct multidimensional_vector {
-//            typedef std::vector<typename multidimensional_vector<mD - 1, mT>::type> type;
-//        };
+        std::vector<T> get_value() { return this->mTensor; };
 
-
-//        template<typename cT>
-//        void reset(cT (&sizes)[D] = {0}, T &value = 0);
-
-    
-    
     private:
-//        typename multidimensional_vector<D, T>::type mTensor;
-        std::vector< T > mTensor;
+        std::vector<T> mTensor;
+
         // Actual initialization method used in the constructor
         template<typename cT>
-        void initializer(cT &size = 1, T &value = 0);
+        void initializer(cT (&sizes)[1], T &value = 0);
     };
 
 };

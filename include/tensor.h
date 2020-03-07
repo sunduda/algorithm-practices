@@ -9,70 +9,64 @@
 #include <cstddef>
 #include <vector>
 #include <ostream>
+#include <stdexcept>
 
-namespace xinda_math {
+namespace tensor_toolkit {
     constexpr double PRECISION = 10e-12;
     constexpr unsigned long GIGABYTE = 1073741824;
-
-    template<std::size_t D, typename T>
+    constexpr unsigned short NULLPTR_EXC = 0x10;
+    constexpr char NULLPTR_EXC_STR[74] = "RUNTIME ERROR: Invalid reference to a tensor element!\r\nProgramme stopped!";
+    constexpr unsigned short FAILED_INIT_EXC = 0x10;
+    constexpr char FAILED_INIT_STR[64] = "RUNTIME ERROR: Tensor initializatio failed!\r\nProgramme stopped!";
+    
+    template<typename T>
     class tensor {
     public:
-        // Constructor
-        template<typename cT>
-        explicit tensor(cT (&sizes)[D], T &value = 0);
-
-        template<typename cT>
-        explicit tensor(cT (&sizes)[D], T value = 0);
-
-        explicit tensor(const std::size_t sizes[D], T &value = 0);
-
-        explicit tensor(const std::size_t sizes[D], T value = 0);
-
-        // Destructor
-        virtual ~tensor() = default;
-
-    protected:
-        std::vector<tensor<D - 1, T>> get_value() { return this->mTensor; };
-
+        explicit tensor(std::vector<std::size_t> dimensions);
+        
+        tensor(std::vector<std::size_t> dimensions, std::vector<T> vec);
+        
+        class tensor_view {
+        public:
+            // Constructor
+            tensor_view(tensor<T> &vec, std::size_t index, std::size_t dimension);
+            
+            tensor_view &operator[](std::size_t n_index);
+            
+            explicit operator T() const;
+            
+            tensor_view &operator=(T val);
+            
+            virtual ~tensor_view() = default;
+            
+            friend std::ostream &operator<<(std::ostream &os, const tensor<T>::tensor_view &tv) {
+                if (tv.mValue != nullptr)
+                    os << *tv.mValue;
+                else {
+                    std::cout << NULLPTR_EXC_STR << std::endl;
+                    std::exit(NULLPTR_EXC);
+                }
+                return os;
+            };
+        
+        private:
+            tensor<T> &mTensor;
+            T *mValue;
+            std::size_t mIndex;
+            std::size_t mDimension;
+        };
+        
+        tensor<T>::tensor_view operator[](std::size_t index);
+        
+        void assign_each(const std::vector<T> &vec);
+        
+        std::vector<T> get_values() const { return mValues; };
+    
     private:
-        std::vector<tensor<D - 1, T>> mTensor;
-
-        // Actual initialization method used in the constructor
-        template<typename cT>
-        void initializer(cT (&sizes)[D], T &value);
-
+        std::vector<T> mValues;
+        std::vector<std::size_t> mDimensions;
     };
-
-    template<typename T>
-    class tensor<1, T> {
-    public:
-        // Constructor
-        template<typename cT>
-        explicit tensor(cT (&sizes)[1], T &value = 0);
-
-        template<typename cT>
-        explicit tensor(cT (&sizes)[1], T value = 0);
-
-        explicit tensor(const std::size_t sizes[1], T &value = 0);
-
-        explicit tensor(const std::size_t sizes[1], T value = 0);
-
-        // Destructor
-        virtual ~tensor() = default;
-
-    protected:
-        std::vector<T> get_value() { return this->mTensor; };
-
-    private:
-        std::vector<T> mTensor;
-
-        // Actual initialization method used in the constructor
-        template<typename cT>
-        void initializer(cT (&sizes)[1], T &value = 0);
-    };
-
 };
-
 
 #endif //TENSOR_TOOLKIT_TENSOR_H
 

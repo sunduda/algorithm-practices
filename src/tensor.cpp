@@ -2,96 +2,112 @@
 // Created by sunduda on 3/4/20.
 //
 
-#include "tensor.h"
 #include <iostream>
 #include <algorithm>
+#include <utility>
+#include "tensor.h"
 
-using namespace xinda_math;
-
-template<std::size_t D, typename T>
-template<typename cT>
-tensor<D, T>::tensor(cT (&sizes)[D], T &value) {
-    tensor<D, T>::initializer(sizes, value);
-}
-
-template<std::size_t D, typename T>
-template<typename cT>
-tensor<D, T>::tensor(cT (&sizes)[D], T value) {
-    tensor<D, T>::initializer(sizes, value);
-}
-
-template<std::size_t D, typename T>
-tensor<D, T>::tensor(const std::size_t *sizes, T &value) {
-    std::size_t psizes[D] = {0};
-    for(std::size_t i=0;i<D;i++) psizes[i] = sizes[i];
-    tensor<D, T>::initializer(psizes, value);
-}
-
-template<std::size_t D, typename T>
-tensor<D, T>::tensor(const std::size_t *sizes, T value) {
-    std::size_t psizes[D] = {0};
-    for(std::size_t i=0;i<D;i++) psizes[i] = sizes[i];
-    tensor<D, T>::initializer(psizes, value);
-}
-
-template<std::size_t D, typename T>
-template<typename cT>
-void tensor<D, T>::initializer(cT (&sizes)[D], T &value) {
-    if (!(std::is_same<cT, std::size_t>::value || std::is_same<cT, unsigned short>::value ||
-          std::is_same<cT, unsigned>::value || std::is_same<cT, unsigned long>::value))
-        throw std::invalid_argument("Invalid typename!");
-    cT new_sizes[D - 1];
-    for (std::size_t i = 1; i < D; i++) new_sizes[i - 1] = sizes[i];
-    tensor<D - 1, T> &temp_tensor(new_sizes, value);
-    for (cT i = 0; i < sizes[0]; i++) this->mTensor.push_back(temp_tensor.get_value());
+template<typename T>
+tensor_toolkit::tensor<T>::tensor(std::vector<std::size_t> dimensions) :
+        mDimensions(std::move(dimensions)) {
+    std::size_t size = mDimensions[0];                    // Initialize the variable
+    for (std::size_t i = 1; i < mDimensions.size(); i++)
+        size *= mDimensions[i];                           // Multiply the size of each dimension
+    mValues.resize(size);                                 // Resize the vector to make it large enough
+    mValues.shrink_to_fit();
 }
 
 template<typename T>
-template<typename cT>
-tensor<1, T>::tensor(cT (&sizes)[1], T &value) {
-    tensor<1, T>::initializer(sizes, value);
+tensor_toolkit::tensor<T>::tensor(std::vector<std::size_t> dimensions, std::vector<T> vec) :
+        mDimensions(std::move(dimensions)), mValues(std::move(vec)) {
+    std::size_t size = mDimensions[0];                    // Initialize the variable
+    for (std::size_t i = 1; i < mDimensions.size(); i++)
+        size *= mDimensions[i];                           // Multiply the size of each dimension
+    if (size != mValues.size()) {
+        std::cout << tensor_toolkit::FAILED_INIT_STR << std::endl;
+        std::exit(tensor_toolkit::FAILED_INIT_EXC);
+    }
 }
 
 template<typename T>
-template<typename cT>
-tensor<1, T>::tensor(cT (&sizes)[1], T value) {
-    tensor<1, T>::initializer(sizes, value);
+typename tensor_toolkit::tensor<T>::tensor_view tensor_toolkit::tensor<T>::operator[](std::size_t index) {
+    return tensor<T>::tensor_view(*this, index, 1);
 }
 
 template<typename T>
-tensor<1, T>::tensor(const std::size_t *sizes, T &value) {
-    std::size_t psizes[1] = {1};
-    psizes[0] = sizes[0];
-    tensor<1, T>::initializer(psizes, value);
+tensor_toolkit::tensor<T>::tensor_view::tensor_view(tensor<T> &vec, std::size_t index, std::size_t dimension) :
+        mTensor(vec), mValue(nullptr), mIndex(index), mDimension(dimension) {
+    
 }
 
 template<typename T>
-tensor<1, T>::tensor(const std::size_t *sizes, T value) {
-    std::size_t psizes[1] = {1};
-    psizes[0] = sizes[0];
-    tensor<1, T>::initializer(psizes, value);
+typename tensor_toolkit::tensor<T>::tensor_view &
+tensor_toolkit::tensor<T>::tensor_view::operator[](std::size_t n_index) {
+    int index_multiplyer = 1;
+    for (int i = 0; i < mDimension; ++i)
+        index_multiplyer *= mTensor.mDimensions[i];
+    mIndex += n_index * index_multiplyer;
+    mDimension++;
+    if (mDimension == mTensor.mDimensions.size())
+        mValue = &(mTensor.mValues[mIndex]);
+    else
+        mValue = nullptr;
+    return *this;
 }
 
 template<typename T>
-template<typename cT>
-void tensor<1, T>::initializer(cT (&sizes)[1], T &value) {
-    if (!(std::is_same<cT, std::size_t>::value || std::is_same<cT, unsigned short>::value ||
-          std::is_same<cT, unsigned>::value || std::is_same<cT, unsigned long>::value))
-        throw std::invalid_argument("Invalid typename!");
-    for (cT i = 0; i < sizes[0]; i++) this->mTensor.push_back(value);
+tensor_toolkit::tensor<T>::tensor_view::operator T() const {
+    if (mValue != nullptr)
+        return *mValue;
+    else {
+        std::cout << NULLPTR_EXC_STR << std::endl;
+        std::exit(NULLPTR_EXC);
+    }
 }
 
-//
-//template<std::size_t D, typename T>
-//template<typename cT>
-//void tensor<D, T>::reset(cT (&sizes)[D], T &value) {
-//    if (!(std::is_same<cT, std::size_t>::value || std::is_same<cT, unsigned short>::value ||
-//          std::is_same<cT, unsigned>::value || std::is_same<cT, unsigned long>::value))
-//        throw std::invalid_argument("Invalid typename!");
-//    cT(&new_sizes)[D - 1] = sizes + 1;
-//    tensor<D - 1, T> &temp_tensor(new_sizes, value);
-//    for (cT i = 0; i < sizes[0]; i++) this->mTensor.push_back(temp_tensor.get_value());
-//}
+template<typename T>
+typename tensor_toolkit::tensor<T>::tensor_view &tensor_toolkit::tensor<T>::tensor_view::operator=(T val) {
+    if (mValue != nullptr)
+        *mValue = val;
+    else {
+        std::cout << tensor_toolkit::NULLPTR_EXC_STR << std::endl;
+        std::exit(tensor_toolkit::NULLPTR_EXC);
+    }
+    return *this;
+}
+
+template<typename T>
+void tensor_toolkit::tensor<T>::assign_each(const std::vector<T> &vec) {
+    if (mValues.size() != vec.size()) {
+        std::cout << tensor_toolkit::NULLPTR_EXC_STR << std::endl;
+        std::exit(tensor_toolkit::NULLPTR_EXC);
+    }
+    for (auto i = 0; i < mValues.size(); i++)
+        mValues[i] = vec[i];
+}
+
+// Class tensor instantiation
+template
+class tensor_toolkit::tensor<short int>;
+
+template
+class tensor_toolkit::tensor<int>;
+
+template
+class tensor_toolkit::tensor<long int>;
+
+template
+class tensor_toolkit::tensor<long long int>;
+
+template
+class tensor_toolkit::tensor<float>;
+
+template
+class tensor_toolkit::tensor<double>;
+
+template
+class tensor_toolkit::tensor<long double>;
+
 
 /*
 template <typename T>
